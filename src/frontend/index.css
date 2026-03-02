@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font faces */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/assets/fonts/PlusJakartaSans[wght].woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/assets/fonts/BricolageGrotesque[opsz,wdth,wght].woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/assets/fonts/GeistMono[wght].woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Infinexy Finance - Navy Blue & Gold professional palette */
+    --background: 0.98 0.004 250;
+    --foreground: 0.18 0.03 255;
+
+    --card: 1 0 0;
+    --card-foreground: 0.18 0.03 255;
+
+    --popover: 1 0 0;
+    --popover-foreground: 0.18 0.03 255;
+
+    /* Deep Navy Blue primary */
+    --primary: 0.28 0.08 258;
+    --primary-foreground: 0.99 0 0;
+
+    /* Gold/Amber accent */
+    --accent: 0.75 0.13 68;
+    --accent-foreground: 0.18 0.03 255;
+
+    --secondary: 0.93 0.01 250;
+    --secondary-foreground: 0.28 0.08 258;
+
+    --muted: 0.95 0.005 250;
+    --muted-foreground: 0.52 0.03 255;
+
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.985 0 0;
+
+    --border: 0.88 0.015 255;
+    --input: 0.88 0.015 255;
+    --ring: 0.5 0.1 258;
+
+    --chart-1: 0.646 0.222 41.116;
+    --chart-2: 0.6 0.118 184.704;
+    --chart-3: 0.398 0.07 227.392;
+    --chart-4: 0.828 0.189 84.429;
+    --chart-5: 0.769 0.188 70.08;
+
+    --sidebar: 0.22 0.06 258;
+    --sidebar-foreground: 0.97 0 0;
+    --sidebar-primary: 0.75 0.13 68;
+    --sidebar-primary-foreground: 0.18 0.03 255;
+    --sidebar-accent: 0.3 0.09 258;
+    --sidebar-accent-foreground: 0.97 0 0;
+    --sidebar-border: 0.35 0.06 258;
+    --sidebar-ring: 0.6 0.08 258;
+
+    /* Finance-specific tokens */
+    --navy: 0.22 0.08 258;
+    --navy-light: 0.35 0.07 258;
+    --gold: 0.75 0.13 68;
+    --gold-light: 0.88 0.1 80;
+    --success: 0.6 0.13 145;
+    --warning: 0.75 0.13 68;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Bricolage Grotesque", sans-serif;
+  }
+
+  code, pre, .mono {
+    font-family: "Geist Mono", monospace;
+  }
+}
+
+/* Print styles */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #print-area,
+  #print-area * {
+    visibility: visible !important;
+  }
+  #print-area {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    background: white !important;
+    z-index: 9999 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Print area styling */
+#print-area {
+  display: none;
+}
+
+@media print {
+  #print-area {
+    display: block !important;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: oklch(var(--muted));
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(var(--border));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(var(--muted-foreground));
+}
+
+/* Table print styling */
+.print-bill {
+  font-family: "Plus Jakarta Sans", Arial, sans-serif;
+  background: white;
+  color: #1a1a2e;
+}
+
+.print-bill table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.print-bill th,
+.print-bill td {
+  border: 1px solid #d0d0e0;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 13px;
+}
+
+.print-bill th {
+  background: #1a2456;
+  color: white;
+  font-weight: 600;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.35s ease-out forwards;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(var(--muted)) 25%,
+    oklch(var(--secondary)) 50%,
+    oklch(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

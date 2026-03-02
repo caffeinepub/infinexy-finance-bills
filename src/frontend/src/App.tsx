@@ -106,7 +106,8 @@ export default function App() {
                 INFINEXY FINANCE
               </div>
               <div className="text-white/60 text-xs leading-tight hidden sm:block">
-                Billing & Finance Management
+                401,402 Galav Chamber, Dairy Den, Sayajigunj, Vadodara,
+                Gujarat-390005
               </div>
             </div>
           </div>

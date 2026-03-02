@@ -35,6 +35,16 @@ export function BillHeader({ profile }: BillHeaderProps) {
         </div>
         <div
           style={{
+            fontSize: "11px",
+            color: "#444",
+            fontFamily: "Arial, sans-serif",
+            marginTop: "2px",
+          }}
+        >
+          401,402 Galav Chamber, Dairy Den, Sayajigunj, Vadodara, Gujarat-390005
+        </div>
+        <div
+          style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "2px 24px",

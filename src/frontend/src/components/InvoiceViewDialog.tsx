@@ -95,12 +95,16 @@ export function InvoiceViewDialog({
                 className={
                   invoice.copyType === "transport"
                     ? "bg-accent/20 text-accent-foreground mt-1"
-                    : "bg-navy/10 text-navy mt-1"
+                    : invoice.copyType === "original"
+                      ? "bg-emerald-100 text-emerald-800 mt-1"
+                      : "bg-navy/10 text-navy mt-1"
                 }
               >
                 {invoice.copyType === "transport"
                   ? "Transport Copy"
-                  : "Customer Copy"}
+                  : invoice.copyType === "original"
+                    ? "Original Copy"
+                    : "Customer Copy"}
               </Badge>
             </div>
             <div className="text-right text-sm space-y-1">

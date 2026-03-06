@@ -83,6 +83,7 @@ type SerializedExpense = {
   paymentDate: string;
   notes?: string;
   placeOfSupply: string;
+  signatureUrl?: string;
 };
 
 // ── Default tax rates (GST slabs) ────────────────────────────────────────────
@@ -186,7 +187,9 @@ function deserializeInvoice(inv: SerializedInvoice): Invoice {
   };
 }
 
-function serializeExpense(exp: Expense): SerializedExpense {
+function serializeExpense(
+  exp: Expense & { signatureUrl?: string },
+): SerializedExpense {
   return {
     id: exp.id,
     amount: String(exp.amount),
@@ -196,10 +199,13 @@ function serializeExpense(exp: Expense): SerializedExpense {
     paymentDate: exp.paymentDate,
     notes: exp.notes,
     placeOfSupply: exp.placeOfSupply,
+    signatureUrl: exp.signatureUrl,
   };
 }
 
-function deserializeExpense(exp: SerializedExpense): Expense {
+function deserializeExpense(
+  exp: SerializedExpense,
+): Expense & { signatureUrl?: string } {
   return {
     id: exp.id,
     amount: BigInt(exp.amount),
@@ -209,6 +215,7 @@ function deserializeExpense(exp: SerializedExpense): Expense {
     paymentDate: exp.paymentDate,
     notes: exp.notes,
     placeOfSupply: exp.placeOfSupply,
+    signatureUrl: exp.signatureUrl,
   };
 }
 

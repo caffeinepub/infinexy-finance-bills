@@ -5,6 +5,8 @@ import { FileText, LogOut, Receipt, Settings } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import type { Expense, Invoice } from "./backend.d";
+
+type ExpenseWithSignature = Expense & { signatureUrl?: string };
 import { CreateExpense } from "./components/CreateExpense";
 import { CreateInvoice } from "./components/CreateInvoice";
 import { ExpenseList } from "./components/ExpenseList";
@@ -33,7 +35,9 @@ export default function App() {
   const [editInvoice, setEditInvoice] = useState<Invoice | null>(null);
 
   const [expensesView, setExpensesView] = useState<ExpensesView>("list");
-  const [editExpense, setEditExpense] = useState<Expense | null>(null);
+  const [editExpense, setEditExpense] = useState<ExpenseWithSignature | null>(
+    null,
+  );
 
   // Check local auth on mount
   useEffect(() => {

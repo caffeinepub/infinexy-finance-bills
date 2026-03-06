@@ -12,8 +12,10 @@ import { Download, Pencil, Printer, X } from "lucide-react";
 import type { Expense } from "../backend.d";
 import { formatDate } from "../utils/formatting";
 
+type ExpenseWithSignature = Expense & { signatureUrl?: string };
+
 interface ExpenseViewDialogProps {
-  expense: Expense;
+  expense: ExpenseWithSignature;
   onClose: () => void;
   onEdit: () => void;
   onPrint: () => void;
@@ -133,6 +135,18 @@ export function ExpenseViewDialog({
                 <span className="bg-muted/40 rounded p-2 text-foreground">
                   {expense.notes}
                 </span>
+              </div>
+            )}
+            {expense.signatureUrl && (
+              <div className="flex flex-col gap-1">
+                <span className="text-muted-foreground font-medium">
+                  Signature
+                </span>
+                <img
+                  src={expense.signatureUrl}
+                  alt="Signature"
+                  className="h-16 max-w-48 object-contain border border-border rounded bg-white"
+                />
               </div>
             )}
           </div>

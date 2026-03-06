@@ -132,7 +132,6 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
   const [newTaxPercentage, setNewTaxPercentage] = useState("");
   const [newTaxCgst, setNewTaxCgst] = useState("");
   const [newTaxSgst, setNewTaxSgst] = useState("");
-  const [newTaxIgst, setNewTaxIgst] = useState("");
 
   // Print state
   const [printInvoiceData, setPrintInvoiceData] = useState<Invoice | null>(
@@ -294,7 +293,7 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
         ),
         cgst: BigInt(Math.round(Number.parseFloat(newTaxCgst || "0") * 100)),
         sgst: BigInt(Math.round(Number.parseFloat(newTaxSgst || "0") * 100)),
-        igst: BigInt(Math.round(Number.parseFloat(newTaxIgst || "0") * 100)),
+        igst: BigInt(0), // Intra-state supply: IGST not applicable
       } as TaxRate);
       toast.success("Tax rate added");
       setShowAddTaxDialog(false);
@@ -302,7 +301,6 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
       setNewTaxPercentage("");
       setNewTaxCgst("");
       setNewTaxSgst("");
-      setNewTaxIgst("");
     } catch {
       toast.error("Failed to add tax rate");
     }
@@ -574,8 +572,7 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
                                   value={String(Number(rate.id))}
                                 >
                                   {pct(rate.percentage)}% — CGST{" "}
-                                  {pct(rate.cgst)}% + SGST {pct(rate.sgst)}% |
-                                  IGST {pct(rate.igst)}%
+                                  {pct(rate.cgst)}% + SGST {pct(rate.sgst)}%
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -590,12 +587,13 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
                               const price =
                                 Number.parseFloat(item.sellingPrice) || 0;
                               const qty = Number.parseInt(item.quantity) || 0;
+                              // Intra-state supply: only CGST + SGST, no IGST
                               const calc = calculateTax(
                                 price,
                                 qty,
                                 pct(rate.cgst),
                                 pct(rate.sgst),
-                                pct(rate.igst),
+                                0,
                               );
                               return (
                                 <div className="text-xs text-muted-foreground bg-muted/50 rounded p-2 mt-1 space-y-0.5">
@@ -607,12 +605,6 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
                                     SGST ({pct(rate.sgst)}%): ₹
                                     {calc.sgst.toFixed(2)}
                                   </div>
-                                  {calc.igst > 0 && (
-                                    <div>
-                                      IGST ({pct(rate.igst)}%): ₹
-                                      {calc.igst.toFixed(2)}
-                                    </div>
-                                  )}
                                   <div className="font-semibold pt-1 border-t border-border">
                                     Item Total: ₹
                                     {(
@@ -857,7 +849,7 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
                 <RadioGroup
                   value={copyType}
                   onValueChange={setCopyType}
-                  className="flex gap-6"
+                  className="flex flex-wrap gap-6"
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="customer" id="customer-copy" />
@@ -875,6 +867,15 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
                       className="cursor-pointer font-normal"
                     >
                       Transport Copy
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="original" id="original-copy" />
+                    <Label
+                      htmlFor="original-copy"
+                      className="cursor-pointer font-normal"
+                    >
+                      Original Copy
                     </Label>
                   </div>
                 </RadioGroup>
@@ -1039,7 +1040,7 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
                 placeholder="e.g., 12"
               />
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>CGST (%)</Label>
                 <Input
@@ -1056,15 +1057,6 @@ export function CreateInvoice({ editInvoice, onBack }: CreateInvoiceProps) {
                   value={newTaxSgst}
                   onChange={(e) => setNewTaxSgst(e.target.value)}
                   placeholder="6"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>IGST (%)</Label>
-                <Input
-                  type="number"
-                  value={newTaxIgst}
-                  onChange={(e) => setNewTaxIgst(e.target.value)}
-                  placeholder="12"
                 />
               </div>
             </div>

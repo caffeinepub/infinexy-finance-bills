@@ -24,11 +24,14 @@ import {
   Plus,
   Printer,
   Save,
+  Upload,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import type { Expense } from "../backend.d";
+
+type ExpenseWithSignature = Expense & { signatureUrl?: string };
 import {
   useAddExpenseCategory,
   useCreateExpense,
@@ -43,7 +46,7 @@ import { ExpensePrintView } from "./ExpensePrintView";
 const PAYMENT_TYPES = ["UPI", "Cash", "Card", "Net Banking", "Cheque", "EMI"];
 
 interface CreateExpenseProps {
-  editExpense?: Expense | null;
+  editExpense?: ExpenseWithSignature | null;
   onBack: () => void;
 }
 
@@ -72,14 +75,32 @@ export function CreateExpense({ editExpense, onBack }: CreateExpenseProps) {
   const [notes, setNotes] = useState(editExpense?.notes || "");
   const [placeOfSupply] = useState(editExpense?.placeOfSupply || "24-Gujarat");
 
+  // Signature state
+  const [signatureUrl, setSignatureUrl] = useState(
+    editExpense?.signatureUrl || "",
+  );
+  const [signaturePreview, setSignaturePreview] = useState(
+    editExpense?.signatureUrl || "",
+  );
+  const signatureInputRef = useRef<HTMLInputElement | null>(null);
+
   // Add category dialog
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
 
   // Print state
-  const [printExpenseData, setPrintExpenseData] = useState<Expense | null>(
-    null,
-  );
+  const [printExpenseData, setPrintExpenseData] =
+    useState<ExpenseWithSignature | null>(null);
+
+  const handleSignatureUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setSignatureUrl(dataUrl);
+      setSignaturePreview(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const validate = () => {
     if (!amount || Number.parseFloat(amount) <= 0) {
@@ -105,7 +126,7 @@ export function CreateExpense({ editExpense, onBack }: CreateExpenseProps) {
     return true;
   };
 
-  const buildPayload = (): Expense => {
+  const buildPayload = (): ExpenseWithSignature => {
     return {
       id: editExpense?.id || "",
       amount: BigInt(Math.round(Number.parseFloat(amount))),
@@ -115,6 +136,7 @@ export function CreateExpense({ editExpense, onBack }: CreateExpenseProps) {
       paymentDate,
       notes: notes || undefined,
       placeOfSupply,
+      signatureUrl: signatureUrl || undefined,
     };
   };
 
@@ -123,14 +145,16 @@ export function CreateExpense({ editExpense, onBack }: CreateExpenseProps) {
 
     try {
       const payload = buildPayload();
-      let savedExpense: Expense;
+      let savedExpense: ExpenseWithSignature;
 
       if (isEditing) {
-        await updateExpense.mutateAsync(payload);
+        await updateExpense.mutateAsync(payload as Expense);
         savedExpense = payload;
         toast.success("Expense updated successfully");
       } else {
-        savedExpense = await createExpense.mutateAsync(payload);
+        savedExpense = (await createExpense.mutateAsync(
+          payload as Expense,
+        )) as ExpenseWithSignature;
         toast.success("Expense saved successfully");
       }
 
@@ -362,6 +386,57 @@ export function CreateExpense({ editExpense, onBack }: CreateExpenseProps) {
               placeholder="Add any notes about this expense..."
               rows={3}
             />
+          </div>
+
+          {/* Signature Upload */}
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold">
+              Signature (Optional)
+            </Label>
+            <div className="flex items-center gap-4">
+              <input
+                ref={signatureInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleSignatureUpload(file);
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => signatureInputRef.current?.click()}
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Upload Signature
+              </Button>
+              {signaturePreview ? (
+                <div className="relative">
+                  <img
+                    src={signaturePreview}
+                    alt="Signature"
+                    className="h-20 max-w-48 object-contain border border-border rounded bg-white"
+                  />
+                  <button
+                    type="button"
+                    className="absolute -top-2 -right-2 bg-destructive text-white rounded-full h-5 w-5 flex items-center justify-center text-xs"
+                    onClick={() => {
+                      setSignatureUrl("");
+                      setSignaturePreview("");
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <div className="h-20 w-48 border-2 border-dashed border-border rounded flex items-center justify-center text-muted-foreground text-sm">
+                  No signature uploaded
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

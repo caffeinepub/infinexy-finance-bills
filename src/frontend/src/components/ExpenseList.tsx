@@ -49,9 +49,11 @@ import { downloadAsPDF, printElement } from "../utils/printUtils";
 import { ExpensePrintView } from "./ExpensePrintView";
 import { ExpenseViewDialog } from "./ExpenseViewDialog";
 
+type ExpenseWithSignature = Expense & { signatureUrl?: string };
+
 interface ExpenseListProps {
   onCreateExpense: () => void;
-  onEditExpense: (expense: Expense) => void;
+  onEditExpense: (expense: ExpenseWithSignature) => void;
 }
 
 const paymentTypeColors: Record<string, string> = {
@@ -72,10 +74,14 @@ export function ExpenseList({
   const deleteExpense = useDeleteExpense();
 
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-  const [printExpense, setPrintExpense] = useState<Expense | null>(null);
-  const [viewExpense, setViewExpense] = useState<Expense | null>(null);
+  const [printExpense, setPrintExpense] = useState<ExpenseWithSignature | null>(
+    null,
+  );
+  const [viewExpense, setViewExpense] = useState<ExpenseWithSignature | null>(
+    null,
+  );
 
-  const handlePrint = (expense: Expense) => {
+  const handlePrint = (expense: ExpenseWithSignature) => {
     setPrintExpense(expense);
     setTimeout(() => {
       printElement("expense-print-area");
@@ -83,7 +89,7 @@ export function ExpenseList({
     }, 150);
   };
 
-  const handleDownload = (expense: Expense) => {
+  const handleDownload = (expense: ExpenseWithSignature) => {
     setPrintExpense(expense);
     setTimeout(() => {
       downloadAsPDF("expense-print-area", `Expense-${expense.id}`);
